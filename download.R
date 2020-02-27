@@ -4,6 +4,7 @@ library(purrr)
 library(crayon)
 library(glue)
 library(lubridate)
+library(progress)
 
 # Function expects date as a string in YYYY-MM-DD format
 get_diet_day <- function(date = "2020-01-27") {
@@ -46,5 +47,17 @@ print_diet_day <- function(dietPlan) {
   }) %>% invisible()
 }
 
+backup_diet_day <- function(date, diet) {
+  write(toJSON(diet), glue("data/raw/{date}.json"))
+}
+
+backup_raw_diet <- function(start, end) {
+  dates <- seq(ymd(start), ymd(end), by = "days")
+  bar <- progress_bar$new(total = length(dates))
+  map(dates, ~ {bar$tick(); backup_diet_day(., get_diet_day(.))})
+  invisible()
+}
+
+backup_raw_diet("2020-02-15", "2020-08-10")
 
 
