@@ -57,7 +57,7 @@ backup_raw_diet <- function(start, end) {
   map(dates, ~ {bar$tick(); backup_diet_day(., get_diet_day(.))})
   invisible()
 }
+# backup_raw_diet("2020-02-15", "2020-08-10")
 
-backup_raw_diet("2020-02-15", "2020-08-10")
 
 
