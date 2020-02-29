@@ -10,8 +10,10 @@ sidebar <- function(page_title, icon_img) {
     opacity = 0.8,
     bs4SidebarMenu(
       bs4SidebarHeader("Diet creator"),
-      bs4SidebarMenuItem("By date", tabName = "creator-by-date", icon = "id-card"),
-      bs4SidebarMenuItem("By dish", tabName = "creator-by-dish", icon = "sliders")
+      bs4SidebarMenuItem("View diet by Ann", tabName = "view-ann", icon = "id-card"),
+      bs4SidebarMenuItem("Compose diet", tabName = "compose-diet", icon = "sliders"),
+      bs4SidebarMenuItem("Add recipe", tabName = "add-recipe", icon = "sliders"),
+      bs4SidebarMenuItem("Shopping list", tabName = "shopping-list", icon = "sliders")
     )
   )
 }
@@ -20,34 +22,14 @@ body <- function() {
   bs4DashBody(
     bs4TabItems(
       bs4TabItem(
-        tabName = "creator-by-date",
+        tabName = "view-ann",
         dateInput("selectedDate", "Pick date"),
         uiOutput("dateUI")
       ),
       bs4TabItem(
-        tabName = "creator-by-dish",
-        bs4Card(
-          title = "Card with messages",
-          width = 9,
-          userMessages(
-            width = 12,
-            status = "success",
-            userMessage(
-              author = "Alexander Pierce",
-              date = "20 Jan 2:00 pm",
-              src = "https://adminlte.io/themes/AdminLTE/dist/img/user1-128x128.jpg",
-              side = NULL,
-              "Is this template really for free? That's unbelievable!"
-            ),
-            userMessage(
-              author = "Dana Pierce",
-              date = "21 Jan 4:00 pm",
-              src = "https://adminlte.io/themes/AdminLTE/dist/img/user5-128x128.jpg",
-              side = "right",
-              "Indeed, that's unbelievable!"
-            )
-          )
-        )
+        tabName = "compose-diet",
+        dateRangeInput("coposeDietDateRange", "Pick dates", start = today(), end = today() + days(6)),
+        uiOutput("composeDietUI")
       )
     )
   )

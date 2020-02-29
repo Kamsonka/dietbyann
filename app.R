@@ -7,9 +7,13 @@ library(purrrlyr)
 library(dplyr)
 
 source("ui/bootstrap_components.R")
+source("meals.R")
+source("persistance.R")
 
 page_title <- "Diet by Kami"
 icon_img <- "https://resize.goldenline.io/1/display/resize?url=https%3A%2F%2Fstatic.goldenline.pl%2Fuser_photo%2F045%2Fuser_3558701_70f711_huge.jpg&width=170&height=170&key=d4088ba7a08d4f8fb8c38f03db3949e4"
+
+MEALS <- c("Breakfast", "Snack A", "Lunch", "Snack B", "Dinner")
 
 shiny::shinyApp(
   ui = bs4DashPage(title = page_title, old_school = FALSE, sidebar_mini = TRUE,
@@ -20,13 +24,61 @@ shiny::shinyApp(
     body = body()
   ),
   server = function(input, output) {
+    refresh <- reactiveVal(value = 0)
+
+    output$composeDietUI <- renderUI({
+      dietDateRange <- input$coposeDietDateRange
+      dateRange <- seq(dietDateRange[1], dietDateRange[2], by = "day")
+      tagList(
+        div(style = "display:none", refresh()),
+        bs4Table(cardWrap = TRUE, bordered = TRUE, striped = TRUE,
+                 headTitles = c("Meal", as.character(dateRange)),
+                 map(MEALS, function(meal) {
+                   bs4TableItems(
+                     bs4TableItem(meal),
+                     map(dateRange, ~
+                           bs4TableItem(
+                             selectInput(inputId = glue("{meal}_{.}"),
+                                         selected = get_meal(., meal),
+                                         label = NULL,
+                                         choices = c(Choose='', ALL_DISHES$name),
+                                         selectize = TRUE,
+                                         width = "100%")
+                           )
+                     )
+                   )
+                 }),
+                 bs4TableItems(
+                   bs4TableItem("Actions"),
+                   map(dateRange, ~
+                         bs4TableItem(actionButton(
+                           glue("{.}_duplicate_tomorrow"), label = "Tomorrow", icon = icon("copy")
+                         ))
+                   )
+                 )
+        )
+      )
+    })
+
+    observe({
+      dietDateRange <- input$coposeDietDateRange
+      dateRange <- seq(dietDateRange[1], dietDateRange[2], by = "day")
+      map(dateRange, function(date) {
+        id <- glue("{date}_duplicate_tomorrow")
+        observeEvent(input[[id]], {
+          duplicate_tomorrow(id)
+          refresh(isolate(refresh()) + 1)
+        })
+        map(MEALS, function(meal) {
+          id <- glue("{meal}_{date}")
+          observeEvent(input[[id]], {save_meal(id, input[[id]])})
+        })
+      })
+    })
 
     output$dateUI <- renderUI({
-      filename <- glue("data/raw/{input$selectedDate}.json")
-      diet <- fromJSON(filename)
-      meals <- diet$data$me$dayPlan$events %>%
-        select(name, preparationTime, dishes) %>%
-        as_tibble()
+      diet <- read_plan(input$selectedDate)
+      meals <- get_meals(diet)
       fluidRow(
         map(1:nrow(meals), function(row) {
           meal <- meals[row, ]
