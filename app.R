@@ -5,10 +5,12 @@ library(jsonlite)
 library(purrr)
 library(purrrlyr)
 library(dplyr)
+library(htmlTable)
 
 source("ui/bootstrap_components.R")
 source("meals.R")
 source("persistance.R")
+source("shopping_list.R")
 
 page_title <- "Diet by Kami"
 icon_img <- "https://resize.goldenline.io/1/display/resize?url=https%3A%2F%2Fstatic.goldenline.pl%2Fuser_photo%2F045%2Fuser_3558701_70f711_huge.jpg&width=170&height=170&key=d4088ba7a08d4f8fb8c38f03db3949e4"
@@ -43,6 +45,7 @@ shiny::shinyApp(
                                          label = NULL,
                                          choices = c(Choose='', ALL_DISHES$name),
                                          selectize = TRUE,
+                                         multiple = TRUE,
                                          width = "100%")
                            )
                      )
@@ -74,6 +77,19 @@ shiny::shinyApp(
           observeEvent(input[[id]], {save_meal(id, input[[id]])})
         })
       })
+    })
+
+    output$shoppingListUI <- renderUI({
+      shoppingDateRange <- input$shoppingListDateRange
+      dateRange <- seq(shoppingDateRange[1], shoppingDateRange[2], by = "day")
+      shopping_list <- create_shopping_list(dateRange)
+      shopping_list %>% by_row(function(item) {
+        bs4Card(
+          title = item$name,
+          width = 12,
+          HTML(htmlTable(item$total[[1]]))
+        )
+      }) %>% {.$.out}
     })
 
     output$dateUI <- renderUI({

@@ -30,6 +30,11 @@ body <- function() {
         tabName = "compose-diet",
         dateRangeInput("coposeDietDateRange", "Pick dates", start = today(), end = today() + days(6)),
         uiOutput("composeDietUI")
+      ),
+      bs4TabItem(
+        tabName = "shopping-list",
+        dateRangeInput("shoppingListDateRange", "Pick dates", start = today(), end = today() + days(6)),
+        uiOutput("shoppingListUI")
       )
     )
   )

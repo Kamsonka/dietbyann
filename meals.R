@@ -26,13 +26,24 @@ all_dishes <- function(start, end) {
 
 ALL_DISHES_CACHE <- "data/cache/all_dishes.csv"
 
+cache_dish <- function(dish_name, FULL_DISHES) {
+  dish <- FULL_DISHES[FULL_DISHES$name == dish_name, ] %>%
+    select(-id, -key, -isFirstOccurance, -isLastOccurance, -`__typename`) %>%
+    mutate(ingredients = map(ingredients, ~ select(., name, measurements)))
+  filepath <- glue("data/dishes/{dish_name}.json")
+  jsonlite::write_json(dish, filepath, simplifyVector = TRUE)
+}
+
 cache_all_dishes <- function() {
-  ALL_DISHES <- all_dishes("2019-11-17", "2020-03-15") %>%
+  FULL_DISHES <- all_dishes("2019-11-17", "2020-03-15")
+  ALL_DISHES_PURE <- FULL_DISHES %>%
     select(name, recipe) %>%
     unique() %>%
+    apply(2, as.character) %>%
     as_tibble() %>%
-    apply(2, as.character)
-  write.csv2(ALL_DISHES, ALL_DISHES_CACHE, row.names = FALSE)
+    set_names(c("name", "recipe"))
+  map(ALL_DISHES_PURE$name, ~ cache_dish(., FULL_DISHES))
+  write.csv2(ALL_DISHES_PURE, ALL_DISHES_CACHE, row.names = FALSE)
 }
 
 ALL_DISHES <- readr::read_csv2(ALL_DISHES_CACHE) %>%

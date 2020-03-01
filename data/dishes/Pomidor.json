@@ -1,0 +1,1 @@
+[{"name":["Pomidor"],"recipe":[""],"hasReplacement":[false],"isPortioned":[false],"ingredients":[{"name":["Pomidorki koktajlowe"],"measurements":[{"amount":[5],"unit":["piece"],"text":["%s sztuk"],"__typename":["DietProductMeasurement"]},{"amount":[100],"unit":["g"],"text":["%s g"],"__typename":["DietProductMeasurement"]}]}]}]

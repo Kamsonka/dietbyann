@@ -1,0 +1,1 @@
+[{"name":["Kefir"],"recipe":[""],"hasReplacement":[false],"isPortioned":[false],"ingredients":[{"name":["Kefir 2% tłuszczu"],"measurements":[{"amount":[1],"unit":["glass"],"text":["%s szklanka"],"__typename":["DietProductMeasurement"]},{"amount":[250],"unit":["ml"],"text":["%s ml"],"__typename":["DietProductMeasurement"]}]}]}]
